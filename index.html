@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>瘋兔推銷員：王牌狙擊 (最終完美版)</title>
+    <style>
+        /* 引入圓潤可愛的字體 */
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Zen+Maru+Gothic:wght@700;900&display=swap');
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #2c3e50;
+            font-family: 'Zen Maru Gothic', sans-serif;
+            color: white;
+            user-select: none;
+            touch-action: none;
+            /* 馬桶吸盤游標 */
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" style="transform: rotate(-45deg);"><path fill="%23e74c3c" d="M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm0 4c-4.42 0-8 3.58-8 8h16c0-4.42-3.58-8-8-8z"/><rect x="11" y="14" width="2" height="10" fill="%238e44ad"/></svg>') 24 24, auto;
+        }
+
+        /* --- Page 1: Teaching Section (瘋兔特訓中心) --- */
+        #intro-page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle, #ffffff 0%, #b3e5fc 100%);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .intro-container {
+            max-width: 800px;
+            width: 90%;
+            background: rgba(255, 255, 255, 0.9);
+            border: 8px solid #3498db;
+            border-radius: 30px;
+            padding: 20px;
+            box-shadow: 0 15px 0 #2980b9;
+            text-align: center;
+            position: relative;
+        }
+
+        .intro-container::before {
+            content: "🐰";
+            font-size: 80px;
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        .intro-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 40px;
+            color: #e74c3c;
+            margin: 20px 0;
+            text-shadow: 2px 2px 0 #fff;
+            letter-spacing: 2px;
+        }
+
+        .skill-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .skill-card {
+            background: #fff;
+            padding: 15px;
+            border-radius: 20px;
+            border: 4px solid #f1c40f;
+            box-shadow: 0 5px 0 #d35400;
+        }
+
+        .skill-icon { font-size: 50px; display: block; margin-bottom: 5px; }
+        .skill-name { font-size: 22px; font-weight: 900; color: #2c3e50; margin-bottom: 5px; }
+        .skill-desc { font-size: 16px; color: #555; line-height: 1.4; text-align: left; font-weight: bold; }
+
+        .example-box {
+            background: #2ecc71;
+            color: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+            border: 4px dashed #fff;
+        }
+
+        .start-btn {
+            background: #e74c3c;
+            color: white;
+            font-size: 32px;
+            padding: 15px 50px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #c0392b;
+            font-family: 'Fredoka One', cursive;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .start-btn:active {
+            transform: translateY(8px);
+            box-shadow: 0 0 0 #c0392b;
+        }
+
+        /* --- Page 2: Game Section --- */
+        #game-container {
+            display: none;
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        canvas {
+            background: repeating-linear-gradient(45deg, #3498db, #3498db 20px, #2980b9 20px, #2980b9 40px);
+            cursor: crosshair;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 10px;
+            box-sizing: border-box;
+            z-index: 5;
+        }
+
+        .hud-top {
+            display: flex;
+            justify-content: space-between;
+            font-size: 26px;
+            font-family: 'Fredoka One', cursive;
+            text-shadow: 3px 3px 0 #000;
+            color: #fff;
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 15px;
+        }
+
+        .client-box {
+            background: #fff;
+            border: 6px solid #2c3e50;
+            border-radius: 25px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            width: 90%;
+            align-self: center;
+            box-shadow: 0 10px 0 rgba(0,0,0,0.4);
+            pointer-events: none;
+            color: #333;
+            position: relative;
+        }
+        
+        .client-box::after {
+            content: "";
+            position: absolute;
+            bottom: -20px;
+            right: 20px;
+            border-width: 20px 20px 0;
+            border-style: solid;
+            border-color: #fff transparent;
+            display: block;
+            width: 0;
+        }
+
+        .client-avatar { font-size: 60px; display: block; animation: bounceHead 1s infinite alternate; }
+        @keyframes bounceHead { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+
+        .client-text { font-size: 28px; font-weight: 900; line-height: 1.3; margin-bottom: 5px; color: #2c3e50; }
+        .client-sub { 
+            font-size: 24px; 
+            color: #fff; 
+            font-weight: bold; 
+            background: #e67e22; 
+            display: inline-block; 
+            padding: 5px 15px; 
+            border-radius: 50px;
+            box-shadow: 2px 2px 0 #d35400;
+        }
+
+        /* Modals */
+        .modal-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            pointer-events: auto;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 30px;
+            max-width: 500px;
+            width: 95%;
+            color: #333;
+            border: 8px solid #f1c40f;
+            box-shadow: 0 20px 0 #d35400;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        h1 { font-family: 'Fredoka One', cursive; font-size: 40px; color: #e74c3c; margin: 0 0 10px 0; text-transform: uppercase; }
+        p { font-size: 24px; margin: 15px 0; font-weight: bold; }
+        
+        .game-btn {
+            padding: 15px 40px;
+            font-size: 26px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Fredoka One', cursive;
+            margin-top: 20px;
+            box-shadow: 0 8px 0 #1e8449;
+            transition: transform 0.1s;
+        }
+        .game-btn:active { transform: translateY(8px); box-shadow: 0 0 0 #1e8449; }
+
+    </style>
+</head>
+<body>
+
+    <div id="intro-page">
+        <div class="intro-container">
+            <div class="intro-title">🐰 瘋兔推銷特訓班 🐰</div>
+            
+            <div class="skill-grid">
+                <div class="skill-card">
+                    <span class="skill-icon">🗑️</span>
+                    <div class="skill-name">1. 篩選</div>
+                    <div class="skill-desc">看清楚<b>價錢、人數</b>！不合適的直接踢走！</div>
+                </div>
+                <div class="skill-card">
+                    <span class="skill-icon">🔍</span>
+                    <div class="skill-name">2. 比較</div>
+                    <div class="skill-desc">大家都有的功能不用看，要找<b>特別強</b>的地方！</div>
+                </div>
+                <div class="skill-card">
+                    <span class="skill-icon">🧠</span>
+                    <div class="skill-name">3. 隱藏需求</div>
+                    <div class="skill-desc">看穿客戶的心！<br>例如：<b>老人腰骨不好</b>、<b>小朋友怕悶</b>。</div>
+                </div>
+            </div>
+
+            <div class="example-box">
+                <b>💡 示範：</b> 客戶是<b>老人院</b>，想買沙發。<br>
+                🚫 踢走真皮（太貴！）<br>
+                ✅ 射擊 <b>藤沙發</b>（質地硬、有彈性！）<br>
+                ❌ 不選布沙發（太軟、難清潔！）
+            </div>
+
+            <button class="start-btn" onclick="goToGame()">開始射擊！Bwaaah!</button>
+        </div>
+    </div>
+
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="ui-layer">
+            <div class="hud-top">
+                <div>SCORE: <span id="scoreEl">0</span></div>
+                <div id="levelEl" style="color:#f1c40f">LV.1 菜鳥兔</div>
+                <div>🏆 <span id="trophyEl">0</span></div>
+            </div>
+            
+            <div class="client-box" id="clientBox">
+                <span class="client-avatar" id="clientAvatar">👨‍💼</span>
+                <div class="client-text" id="clientReq">載入中...</div>
+                <div class="client-sub" id="clientBg"></div>
+            </div>
+        </div>
+
+        <div id="level-screen" class="modal-screen" style="display: none;">
+            <div class="modal-content">
+                <h1>🎉 過關！BWAAAH!</h1>
+                <p id="level-title-display" style="color:#e67e22;">獲得稱號：瘋兔業務</p>
+                <p>下一波兔子會跑得更快！<br>準備好了嗎？</p>
+                <button class="game-btn" onclick="nextLevel()">下一關</button>
+            </div>
+        </div>
+
+        <div id="game-over-screen" class="modal-screen" style="display: none;">
+            <div class="modal-content">
+                <h1>😭 搞砸了！</h1>
+                <p>最終得分: <span id="final-score">0</span></p>
+                <p>客戶生氣了！<br>看清楚提示再射擊啊！</p>
+                <button class="game-btn" onclick="location.reload()">重新特訓</button>
+            </div>
+        </div>
+
+        <div id="victory-screen" class="modal-screen" style="display: none;">
+            <div class="modal-content">
+                <h1>🏆 王牌瘋兔！</h1>
+                <p>你已經征服了所有客戶！</p>
+                <p style="font-size:40px; color:#27ae60;">得分: <span id="victory-score">0</span></p>
+                <button class="game-btn" onclick="location.reload()">再玩一次</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Audio System ---
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'shoot') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.15);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.15);
+                osc.start(now); osc.stop(now + 0.15);
+            } else if (type === 'hit') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.linearRampToValueAtTime(600, now + 0.1);
+                osc.frequency.linearRampToValueAtTime(100, now + 0.3);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now); osc.stop(now + 0.3);
+            } else if (type === 'miss') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(100, now);
+                osc.frequency.linearRampToValueAtTime(50, now + 0.3);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now); osc.stop(now + 0.3);
+            } else if (type === 'levelup') {
+                [523, 659, 783, 1046].forEach((f, i) => {
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    o.connect(g); g.connect(audioCtx.destination);
+                    o.type = 'sine'; o.frequency.value = f;
+                    g.gain.setValueAtTime(0.1, now + i*0.1);
+                    g.gain.linearRampToValueAtTime(0, now + i*0.1 + 0.4);
+                    o.start(now + i*0.1); o.stop(now + i*0.1 + 0.4);
+                });
+            }
+        }
+
+        // --- 2. Game Logic Setup ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+
+        // State
+        let gameState = 'START';
+        let score = 0;
+        let trophies = 0;
+        let level = 1;
+        let rabbits = [];
+        let particles = [];
+        let spawnQueue = [];
+        let nextSpawnTime = 0;
+        let questionDeck = []; // The deck of questions for the current level
+        let currentQ = null;   // Current active question
+
+        // --- 3. Question Database (修復提示與文字) ---
+        const qL1 = [
+            { id: 101, avatar: "👨‍💼", client: "鍾先生", bg: "明確要求：50人 + 提供茶點", req: "「這三個會議室，哪一個能坐得下 50 人並有茶點？」", correct: "馬蹄型 (50人/茶點)", wrongs: ["長桌型 (40人/茶水)", "小型房 (10人)"] },
+            { id: 102, avatar: "🤵", client: "黃先生", bg: "明確要求：價格最便宜", req: "「預算很緊，哪艘遊艇每小時最便宜？」", correct: "80座高速 ($1000)", wrongs: ["70座豪華 ($2000)", "超級遊艇 ($5000)"] },
+            { id: 103, avatar: "🎣", client: "釣魚會", bg: "明確要求：有專人指導釣墨魚", req: "「我們是新手，想找有專人指導釣墨魚的船。」", correct: "80座高速 (專人指導)", wrongs: ["60座豪華 (無指導)", "小艇 (無設備)"] },
+            { id: 104, avatar: "👩‍💼", client: "陳秘書", bg: "明確要求：地點在中環", req: "「老闆要在中環見客，哪個會議室在中環地鐵站旁？」", correct: "馬蹄型 (中環站)", wrongs: ["長桌型 (旺角站)", "教室型 (銅鑼灣站)"] }
+        ];
+
+        const qL2 = [
+            { id: 201, avatar: "👷", client: "林主任", bg: "明確要求：配件能弄乾鞋子 (Y型管)", req: "「這裏很潮濕，哪款機有配件(Y型管)可以幫我們弄乾鞋子？」", correct: "愛家牌 (附Y型管)", wrongs: ["樂田牌 (全面過濾)", "凱麗牌 (普通功能)"] },
+            { id: 202, avatar: "🏃", client: "活動組", bg: "明確要求：想玩鐳射槍", req: "「年輕同事指名要玩『鐳射槍』，哪裏有？」", correct: "愉景灣 (鐳射槍)", wrongs: ["大角咀 (體操)", "鰂魚涌 (攀石)"] },
+            { id: 203, avatar: "🏠", client: "陳太", bg: "明確要求：抽濕量最大 (22L)", req: "「我家客廳很大，哪一款每日抽濕量最高？」", correct: "樂田牌 (22公升)", wrongs: ["愛家牌 (17公升)", "凱麗牌 (15公升)"] },
+            { id: 204, avatar: "💰", client: "採購部", bg: "明確要求：產地日本", req: "「老闆指定要買日本製造的抽濕機，是哪款？」", correct: "樂田牌 (日本)", wrongs: ["愛家牌 (中國)", "凱麗牌 (馬來西亞)"] },
+            { id: 205, avatar: "🧗", client: "登山會", bg: "明確要求：有競賽攀石賽道", req: "「我們想找有『透明攀爬牆』和競賽賽道的場地。」", correct: "鰂魚涌 (透明牆)", wrongs: ["大角咀 (賽車場)", "愉景灣 (鐳射槍)"] },
+            { id: 206, avatar: "👶", client: "家長會", bg: "明確要求：有大型管狀滑梯", req: "「哪裏有大型管狀滑梯給小朋友玩？」", correct: "愉景灣中心", wrongs: ["健身中心", "辦公室"] }
+        ];
+
+        const qL3 = [
+            { id: 301, avatar: "👵", client: "王婆婆", bg: "隱含：老人腰骨不好，要質地硬、有彈性", req: "「買張沙發放老人院，不想太軟，坐下要容易站起來。」", correct: "藤沙發 (質地硬、有彈性)", wrongs: ["布沙發 (太軟)", "皮沙發 (下陷)"] },
+            { id: 302, avatar: "🎈", client: "黃太", bg: "隱含：小朋友怕悶，需要波波池", req: "「我們搞小朋友生日會，船上有什麼給小孩玩的嗎？」", correct: "70座豪華 (設波波池)", wrongs: ["80座高速 (無設施)", "60座豪華 (只有唱K)"] },
+            { id: 303, avatar: "🍼", client: "張太", bg: "隱含：兒童易弄髒，要防水", req: "「中心小朋友常弄翻果汁，沙發要容易清潔。」", correct: "藤沙發 (防水易擦)", wrongs: ["布沙發 (吸水)", "真皮沙發 (難養)"] },
+            { id: 304, avatar: "👴", client: "李經理", bg: "隱含：75歲長者，需保險", req: "「有幾位75歲的老員工參加，這艘船包保險嗎？」", correct: "60座豪華 (含保險)", wrongs: ["80座高速 (無)", "小艇 (危險)"] },
+            { id: 305, avatar: "🎎", client: "文化學會", bg: "要求：傳統文化 (阿波舞)", req: "「我們想體驗日本古老傳統和阿波舞。」", correct: "四國文化團", wrongs: ["東京購物團", "京阪美食團"] },
+            { id: 306, avatar: "🎥", client: "鍾主任", bg: "隱含：播4K片要環迴立體聲", req: "「發佈會要播4K電影級宣傳片，音響要最好。」", correct: "教室型 (立體聲)", wrongs: ["馬蹄型 (擴音器)", "長桌型 (話筒)"] },
+            { id: 307, avatar: "🎓", client: "畢業班", bg: "隱含：年輕人愛樂園 (迪士尼)", req: "「我們畢業旅行想去迪士尼和買東西！」", correct: "東京團 (迪士尼)", wrongs: ["京阪團 (古蹟)", "四國團 (鄉村)"] },
+            { id: 308, avatar: "💼", client: "陳總裁", bg: "隱含：高檔氣派", req: "「這張沙發要放在我的總裁辦公室接待貴賓。」", correct: "真皮沙發 (高貴)", wrongs: ["布沙發 (普通)", "藤沙發 (休閒)"] }
+        ];
+
+        const levelConfig = {
+            1: { pool: qL1, title: "菜鳥實習兔", speed: 1.2, interval: 1800 },
+            2: { pool: qL2, title: "瘋狂推銷員", speed: 2.2, interval: 1200 },
+            3: { pool: qL3, title: "王牌瘋兔", speed: 3.5, interval: 1000 }
+        };
+
+        // --- 4. Main Functions ---
+
+        function goToGame() {
+            initAudio();
+            document.getElementById('intro-page').style.display = 'none';
+            document.getElementById('game-container').style.display = 'block';
+            resize();
+            startLevel(1);
+        }
+
+        function startLevel(lvl) {
+            level = lvl;
+            gameState = 'PLAYING';
+            // Init Deck: Clone and Shuffle (確保題目不重複)
+            questionDeck = [...levelConfig[level].pool];
+            questionDeck.sort(() => Math.random() - 0.5);
+            
+            // Clean up old state (修復卡關問題)
+            rabbits = [];
+            spawnQueue = [];
+            
+            updateUI();
+            loadNextQuestion();
+            gameLoop();
+        }
+
+        function loadNextQuestion() {
+            // Check if level finished
+            if (questionDeck.length === 0) {
+                completeLevel();
+                return;
+            }
+
+            // Pop 1 unique question
+            currentQ = questionDeck.pop();
+
+            // UI Update
+            document.getElementById('clientAvatar').innerText = currentQ.avatar;
+            document.getElementById('clientReq').innerText = currentQ.req;
+            document.getElementById('clientBg').innerText = "💡 提示: " + currentQ.bg;
+
+            // Prepare Rabbits (Force 3 Items: 1 Correct, 2 Wrong)
+            rabbits = []; 
+            spawnQueue = [];
+            
+            let items = [];
+            items.push({ text: currentQ.correct, isCorrect: true });
+            currentQ.wrongs.forEach(w => items.push({ text: w, isCorrect: false }));
+            items.sort(() => Math.random() - 0.5); // Shuffle options
+            
+            spawnQueue = items;
+            nextSpawnTime = Date.now() + 500;
+        }
+
+        function retryCurrentQuestion() {
+            // 如果沒射中任何一隻兔子，重新投放同一題 (不消耗牌組)
+            rabbits = []; 
+            spawnQueue = [];
+            
+            let items = [];
+            items.push({ text: currentQ.correct, isCorrect: true });
+            currentQ.wrongs.forEach(w => items.push({ text: w, isCorrect: false }));
+            items.sort(() => Math.random() - 0.5);
+            
+            spawnQueue = items;
+            nextSpawnTime = Date.now() + 500;
+        }
+
+        function updateLogic() {
+            // Spawning
+            if (spawnQueue.length > 0 && Date.now() > nextSpawnTime) {
+                const item = spawnQueue.shift();
+                rabbits.push(new Rabbit(item.text, item.isCorrect));
+                nextSpawnTime = Date.now() + levelConfig[level].interval;
+            }
+
+            // Check if all rabbits gone but question not answered (missed correct one)
+            if (spawnQueue.length === 0 && rabbits.length === 0) {
+                retryCurrentQuestion();
+            }
+        }
+
+        function completeLevel() {
+            gameState = 'LEVEL_COMPLETE';
+            playSound('levelup');
+            trophies++;
+            updateUI();
+            
+            if (level === 3) {
+                document.getElementById('victory-score').innerText = score;
+                document.getElementById('victory-screen').style.display = 'flex';
+            } else {
+                document.getElementById('level-title-display').innerText = "獲得稱號：" + levelConfig[level].title;
+                document.getElementById('level-screen').style.display = 'flex';
+            }
+        }
+
+        function nextLevel() {
+            document.getElementById('level-screen').style.display = 'none';
+            startLevel(level + 1);
+        }
+
+        function updateUI() {
+            document.getElementById('scoreEl').innerText = score;
+            document.getElementById('trophyEl').innerText = trophies;
+            document.getElementById('levelEl').innerText = "LV." + level;
+        }
+
+        // --- 5. Rendering (Rabbit Class) ---
+        class Rabbit {
+            constructor(text, isCorrect) {
+                this.text = text;
+                this.isCorrect = isCorrect;
+                this.width = 160;
+                this.x = Math.random() * (canvas.width - 240) + 120;
+                this.y = -200;
+                this.speed = levelConfig[level].speed;
+                this.wobblePhase = Math.random() * Math.PI * 2;
+                this.rotation = 0;
+            }
+
+            update() {
+                this.y += this.speed;
+                this.wobblePhase += 0.1;
+                this.x += Math.sin(this.wobblePhase) * 2;
+                this.rotation = Math.sin(this.wobblePhase) * 0.1;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+
+                // Ears
+                ctx.fillStyle = "white"; ctx.strokeStyle = "#333"; ctx.lineWidth = 3;
+                // Left
+                ctx.beginPath(); ctx.ellipse(-30, -70, 15, 40, -0.2, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = "pink"; ctx.beginPath(); ctx.ellipse(-30, -70, 8, 30, -0.2, 0, Math.PI*2); ctx.fill();
+                // Right
+                ctx.fillStyle = "white"; ctx.beginPath(); ctx.ellipse(30, -70, 15, 40, 0.2, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = "pink"; ctx.beginPath(); ctx.ellipse(30, -70, 8, 30, 0.2, 0, Math.PI*2); ctx.fill();
+
+                // Head
+                ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(0, -40, 45, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+
+                // Crazy Eyes (Red/Blue)
+                ctx.fillStyle = "white"; 
+                ctx.beginPath(); ctx.arc(-15, -50, 14, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+                ctx.beginPath(); ctx.arc(15, -50, 10, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = "#e74c3c"; ctx.beginPath(); ctx.arc(-15, -50, 4, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = "#3498db"; ctx.beginPath(); ctx.arc(15, -50, 2, 0, Math.PI*2); ctx.fill();
+
+                // Teeth
+                ctx.fillStyle = "white"; 
+                ctx.beginPath(); ctx.rect(-10, -30, 8, 12); ctx.fill(); ctx.stroke();
+                ctx.beginPath(); ctx.rect(2, -30, 8, 12); ctx.fill(); ctx.stroke();
+
+                // Sign Board
+                ctx.fillStyle = "#f39c12"; ctx.strokeStyle = "#d35400"; ctx.lineWidth = 4;
+                ctx.beginPath(); ctx.rect(-this.width/2, -10, this.width, 80); ctx.fill(); ctx.stroke();
+                
+                // Nails
+                ctx.fillStyle = "#7f8c8d";
+                ctx.beginPath(); ctx.arc(-this.width/2 + 10, 0, 3, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(this.width/2 - 10, 0, 3, 0, Math.PI*2); ctx.fill();
+
+                // Text
+                ctx.fillStyle = "#2c3e50";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.font = "bold 24px 'Zen Maru Gothic'";
+                
+                // Wrap text
+                if(this.text.length > 8) {
+                    const mid = Math.floor(this.text.length/2);
+                    ctx.fillText(this.text.substring(0, mid), 0, 20);
+                    ctx.fillText(this.text.substring(mid), 0, 50);
+                } else {
+                    ctx.fillText(this.text, 0, 35);
+                }
+
+                ctx.restore();
+            }
+        }
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x; this.y = y; this.color = color;
+                this.vx = (Math.random()-0.5)*15;
+                this.vy = (Math.random()-0.5)*15;
+                this.size = Math.random()*10+5;
+                this.life = 1.0;
+            }
+            update() { this.x += this.vx; this.y += this.vy; this.life -= 0.05; this.size *= 0.9; }
+            draw() {
+                ctx.globalAlpha = this.life; ctx.fillStyle = this.color;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        // --- 6. Game Loop & Input ---
+        function gameLoop() {
+            if (gameState === 'LEVEL_COMPLETE') return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            updateLogic();
+
+            // Draw Rabbits
+            for (let i = rabbits.length - 1; i >= 0; i--) {
+                let r = rabbits[i];
+                r.update();
+                r.draw();
+                if (r.y > canvas.height + 200) {
+                    rabbits.splice(i, 1);
+                }
+            }
+
+            // Draw Particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.update();
+                p.draw();
+                if (p.life <= 0) particles.splice(i, 1);
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function handleTap(x, y) {
+            playSound('shoot');
+            createExplosion(x, y, "#fff");
+
+            for (let i = rabbits.length - 1; i >= 0; i--) {
+                let r = rabbits[i];
+                // Hitbox
+                if (Math.abs(x - r.x) < 80 && Math.abs(y - (r.y+30)) < 80) {
+                    if (r.isCorrect) {
+                        playSound('hit');
+                        score += 3;
+                        createExplosion(r.x, r.y, "#2ecc71");
+                        // Clear rabbits and load next
+                        rabbits = []; spawnQueue = [];
+                        loadNextQuestion();
+                    } else {
+                        playSound('miss');
+                        score -= 1;
+                        createExplosion(r.x, r.y, "#e74c3c");
+                        rabbits.splice(i, 1); // Remove wrong one
+                    }
+                    updateUI();
+                    break;
+                }
+            }
+        }
+
+        function createExplosion(x, y, color) {
+            for(let i=0; i<15; i++) particles.push(new Particle(x, y, color));
+        }
+
+        canvas.addEventListener('mousedown', e => handleTap(e.clientX, e.clientY));
+        canvas.addEventListener('touchstart', e => {
+            e.preventDefault();
+            handleTap(e.touches[0].clientX, e.touches[0].clientY);
+        }, {passive: false});
+
+    </script>
+</body>
+</html>
