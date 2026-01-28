@@ -2,8 +2,17 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>瘋兔推銷員：王牌狙擊 (最終完美版)</title>
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1G1KSXH8DB"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-1G1KSXH8DB');
+    </script>
     <style>
         /* 引入圓潤可愛的字體 */
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Zen+Maru+Gothic:wght@700;900&display=swap');
@@ -26,16 +35,22 @@
             top: 0;
             left: 0;
             width: 100vw;
+            /* [修改] 使用 dvh 適應手機動態網址列，若不支援則退回 100vh */
             height: 100vh;
+            height: 100dvh; 
             background: radial-gradient(circle, #ffffff 0%, #b3e5fc 100%);
             z-index: 200;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: center; /* 內容置中 */
             color: #333;
-            overflow-y: auto;
-            padding: 10px;
+            overflow-y: auto; /* 允許垂直滾動 */
+            -webkit-overflow-scrolling: touch; /* 讓 iOS 滾動更順暢 */
+            
+            /* [修改] 增加底部內距，將內容往上推，避開手機工具列 */
+            padding: 20px 10px 120px 10px; 
+            box-sizing: border-box; /* 確保 padding 不會撐大寬度 */
         }
 
         .intro-container {
@@ -48,6 +63,9 @@
             box-shadow: 0 15px 0 #2980b9;
             text-align: center;
             position: relative;
+            /* [修改] 確保容器本身也有彈性，不會被切掉 */
+            margin-top: auto; 
+            margin-bottom: auto;
         }
 
         .intro-container::before {
@@ -112,6 +130,10 @@
             box-shadow: 0 8px 0 #c0392b;
             font-family: 'Fredoka One', cursive;
             transition: transform 0.1s, box-shadow 0.1s;
+            /* [修改] 確保按鈕周圍有空間 */
+            margin-bottom: 10px;
+            width: 100%; /* 手機上讓按鈕大一點比較好按 */
+            max-width: 400px;
         }
         .start-btn:active {
             transform: translateY(8px);
@@ -123,7 +145,7 @@
             display: none;
             position: relative;
             width: 100vw;
-            height: 100vh;
+            height: 100vh; /* 遊戲畫面維持滿版 */
         }
 
         canvas {
@@ -144,6 +166,9 @@
             padding: 10px;
             box-sizing: border-box;
             z-index: 5;
+            /* [修改] 確保 UI 層不會被瀏海遮擋 */
+            padding-top: max(10px, env(safe-area-inset-top));
+            padding-bottom: max(10px, env(safe-area-inset-bottom));
         }
 
         .hud-top {
